@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taescrip - Coffee & Manga</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Permanent+Marker&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #e67e22;
+            --cream: #fff5e6;
+            --dark: #3e2723;
+            --red: #d32f2f;
+            --input-bg: #fdfcfb;
+            --bg-color: #1a1a1a;
+        }
+
+        body.light-mode { --bg-color: #f0f0f0; }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--dark);
+            padding-bottom: 120px;
+            transition: background 0.5s ease;
+        }
+
+        header {
+            background: linear-gradient(180deg, var(--orange), #d35400);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--dark);
+        }
+
+        header h1 { margin: 0; font-family: 'Fredoka One', cursive; font-size: 2.5rem; text-shadow: 3px 3px 0px var(--dark); }
+
+        .search-container {
+            padding: 15px;
+            background: var(--cream);
+            display: flex;
+            gap: 10px;
+            border-bottom: 4px solid var(--dark);
+        }
+
+        #search-input {
+            flex: 1;
+            padding: 10px;
+            border: 3px solid var(--dark);
+            border-radius: 10px;
+            font-family: 'Fredoka One';
+        }
+
+        .btn-ninja {
+            background: #222;
+            color: #ffdf00;
+            border: 3px solid var(--dark);
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-family: 'Fredoka One';
+            cursor: pointer;
+        }
+
+        .category-nav {
+            display: flex;
+            overflow-x: auto;
+            background: var(--cream);
+            padding: 12px;
+            border-bottom: 4px solid var(--dark);
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            scrollbar-width: none;
+        }
+        .category-nav::-webkit-scrollbar { display: none; }
+
+        .cat-btn {
+            background: white;
+            border: 3px solid var(--dark);
+            padding: 8px 18px;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 50px;
+            white-space: nowrap;
+            box-shadow: 3px 3px 0px var(--dark);
+            cursor: pointer;
+        }
+
+        .cat-btn.active { background: var(--orange); color: white; transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--dark); }
+
+        .container { padding: 15px; max-width: 600px; margin: auto; display: none; opacity: 0; transition: opacity 0.3s ease; min-height: 400px; }
+        .container.active { display: block; opacity: 1; }
+
+        .food-card {
+            background: var(--cream);
+            border: 4px solid var(--dark);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.4);
+        }
+
+        /* SECCIÓN UBICACIÓN */
+        footer.location-section {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        .map-frame {
+            border: 4px solid var(--dark);
+            border-radius: 20px;
+            overflow: hidden;
+            line-height: 0;
+            box-shadow: 5px 5px 0px var(--orange);
+            background: #eee;
+        }
+
+        .btn-maps {
+            background: #4285F4;
+            color: white;
+            border: 3px solid var(--dark);
+            padding: 15px;
+            width: 100%;
+            border-radius: 15px;
+            font-family: 'Fredoka One';
+            font-size: 1.1rem;
+            margin-top: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .price-bubble { background: var(--red); color: white; font-family: 'Fredoka One'; padding: 4px 15px; border-radius: 50px; border: 3px solid var(--dark); display: inline-block; margin: 8px 0; }
+        .btn-add { background: var(--orange); color: white; border: 3px solid var(--dark); padding: 10px; width: 100%; border-radius: 12px; font-family: 'Fredoka One'; cursor: pointer; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: bold; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
+        .btn-delete { background: var(--red); color: white; border: 2px solid var(--dark); border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-family: 'Fredoka One'; margin-bottom: 5px; font-size: 0.85rem; }
+        input, textarea { width: 100%; padding: 12px; border: 3px solid var(--dark); border-radius: 12px; background: var(--input-bg); font-family: 'Fredoka One'; }
+        
+        .social-links { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
+        .social-links a { text-decoration: none; font-family: 'Fredoka One'; color: white; padding: 12px 20px; border-radius: 15px; border: 3px solid var(--dark); font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .btn-ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .btn-tk { background: #000; }
+
+        nav.main-nav { position: fixed; bottom: 0; width: 100%; background: var(--dark); display: flex; justify-content: space-around; padding: 12px 0; border-top: 5px solid var(--orange); z-index: 2000; }
+        nav.main-nav button { background: none; border: none; color: white; font-family: 'Fredoka One'; font-size: 1.1rem; cursor: pointer; position: relative; }
+        nav.main-nav button.active { color: #ffdf00; }
+        .cart-badge { position: absolute; top: -5px; right: -15px; background: var(--red); color: white; font-size: 0.7rem; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>TAESCRIP</h1>
+        <p style="font-family: 'Permanent Marker'; color: var(--cream); margin: 0;">COFFEE STORE PILAR</p>
+    </header>
+
+    <div id="controls-wrapper">
+        <div id="controls" class="search-container">
+            <input type="text" id="search-input" placeholder="Buscar plato..." oninput="handleSearch()">
+            <button class="btn-ninja" onclick="ninjaChoice()">🥷 RANDOM</button>
+        </div>
+
+        <div id="cat-nav-container" class="category-nav">
+            <button class="cat-btn active" onclick="filterMenu('all', this)">TODO</button>
+            <button class="cat-btn" onclick="filterMenu('promos', this)">PROMOS</button>
+            <button class="cat-btn" onclick="filterMenu('coffee', this)">CAFETERÍA</button>
+            <button class="cat-btn" onclick="filterMenu('comida', this)">COMIDA</button>
+        </div>
+    </div>
+
+    <div id="menu" class="container active">
+        <div id="menu-display"></div>
+    </div>
+
+    <div id="pedidos" class="container">
+        <h2 style="color: white; text-align: center; font-family: 'Fredoka One';">RESUMEN DE MISIÓN</h2>
+        <div class="food-card" id="cart-list">Mochila vacía...</div>
+
+        <div class="food-card" style="text-align: left;">
+            <div class="form-group">
+                <label>👤 Tu Nombre</label>
+                <input type="text" id="nombre-cliente" placeholder="Ej: Juan Pérez" oninput="validarFormulario()">
+            </div>
+            <div class="form-group">
+                <label>👥 ¿Cuántos vienen?</label>
+                <input type="number" id="cant-personas" placeholder="Ej: 2" oninput="validarFormulario()">
+            </div>
+            <div class="form-group">
+                <label>⏰ Horario</label>
+                <input type="time" id="horario-pedido" oninput="validarFormulario()">
+            </div>
+            <div class="form-group">
+                <label>📝 Observaciones</label>
+                <textarea id="notas-pedido" placeholder="Ej: Sin azúcar, mesa adentro..."></textarea>
+            </div>
+            <div id="btn-whatsapp-container" style="display:none;">
+                <button onclick="sendOrder()" style="background:#25d366; color:white; border:4px solid var(--dark); padding:18px; width:100%; font-family:'Fredoka One'; font-size:1.5rem; border-radius:15px; cursor:pointer;">¡ENVIAR PEDIDO! 🚩</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="location-section">
+        <h2 style="color: white; text-align: center; font-family: 'Fredoka One'; margin-bottom: 20px;">📍 CÓMO LLEGAR</h2>
+        <div class="map-frame">
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3290.4191316474176!2d-58.9150824!3d-34.4542614!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bc9da38806283d%3A0xc3c6f2df7950f968!2sTaescrip!5e0!3m2!1ses-419!2sar!4v1700000000000" 
+                width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+        <a href="https://maps.app.goo.gl/tH77XFfay4oXoX3b6" target="_blank" class="btn-maps">
+            🚩 VER EN GOOGLE MAPS
+        </a>
+
+        <div class="social-links">
+            <a href="https://www.instagram.com/taescrip.pilar" target="_blank" class="btn-ig">📸 IG</a>
+            <a href="https://www.tiktok.com/@taescrip" target="_blank" class="btn-tk">🎵 TK</a>
+        </div>
+        <p style="color: var(--cream); text-align: center; font-family: 'Fredoka One'; font-size: 0.8rem; opacity: 0.7;">San Martín 549, Pilar, Buenos Aires</p>
+    </footer>
+
+    <nav class="main-nav">
+        <button onclick="showSection('menu')" id="btn-menu" class="active">MENÚ</button>
+        <button onclick="showSection('pedidos')" id="btn-pedidos">
+            CARRITO
+            <span id="badge-count" class="cart-badge" style="display:none;">0</span>
+        </button>
+    </nav>
+
+    <script>
+        const db = [
+            { cat: 'promos', nombre: 'PROMO 1', precio: 5500, desc: 'Latte o Americano + 2 Medialunas' },
+            { cat: 'promos', nombre: 'PROMO 2', precio: 7000, desc: 'Latte o Americano + Tostado J&Q' },
+            { cat: 'coffee', nombre: 'Espresso', precio: 1700, desc: 'Café corto e intenso' },
+            { cat: 'coffee', nombre: 'Latte', precio: 2800, desc: 'Café con leche cremosa' },
+            { cat: 'comida', nombre: 'Ramen Taescrip', precio: 9800, desc: 'Caldo artesanal de 12hs' },
+            { cat: 'comida', nombre: 'Combo Manga (15u)', precio: 12500, desc: 'Variedad de sushi premium' }
+        ];
+
+        let cart = [];
+        let currentFilter = 'all';
+
+        function updateTheme() {
+            const hour = new Date().getHours();
+            if (hour >= 7 && hour < 17) document.body.classList.add('light-mode');
+            else document.body.classList.remove('light-mode');
+        }
+
+        function renderMenu(filtro = 'all', searchStr = '') {
+            const display = document.getElementById('menu-display');
+            display.innerHTML = '';
+            let items = filtro === 'all' ? db : db.filter(i => i.cat === filtro);
+            if(searchStr) items = items.filter(i => i.nombre.toLowerCase().includes(searchStr.toLowerCase()));
+
+            items.forEach(item => {
+                display.innerHTML += `
+                    <div class="food-card">
+                        <h3>${item.nombre}</h3>
+                        <p>${item.desc}</p>
+                        <div class="price-bubble">$${item.precio}</div><br>
+                        <button class="btn-add" onclick="addToCart('${item.nombre}', ${item.precio})">AGREGAR</button>
+                    </div>`;
+            });
+        }
+
+        function handleSearch() { renderMenu(currentFilter, document.getElementById('search-input').value); }
+
+        function filterMenu(cat, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = cat;
+            renderMenu(cat, document.getElementById('search-input').value);
+        }
+
+        function ninjaChoice() {
+            const randomItem = db[Math.floor(Math.random() * db.length)];
+            alert("🥷 El Ninja sugiere: " + randomItem.nombre);
+            addToCart(randomItem.nombre, randomItem.precio);
+        }
+
+        function addToCart(n, p) { cart.push({nombre: n, precio: p}); updateUI(); }
+        function removeFromCart(index) { cart.splice(index, 1); updateUI(); }
+
+        function updateUI() {
+            const list = document.getElementById('cart-list');
+            const badge = document.getElementById('badge-count');
+            if(cart.length === 0) {
+                list.innerHTML = "Mochila vacía...";
+                badge.style.display = "none";
+                validarFormulario();
+                return;
+            }
+            badge.innerText = cart.length;
+            badge.style.display = "flex";
+            let total = cart.reduce((a, b) => a + b.precio, 0);
+            let html = cart.map((i, index) => `
+                <div class="item-row">
+                    <span>${i.nombre}</span>
+                    <span>$${i.precio} <button class="btn-delete" onclick="removeFromCart(${index})">X</button></span>
+                </div>`).join('');
+            html += `<div style="text-align:right; font-family:'Fredoka One'; font-size:1.8rem; color:var(--orange);">TOTAL: $${total}</div>`;
+            list.innerHTML = html;
+            validarFormulario();
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.container').forEach(c => { c.classList.remove('active'); c.style.opacity = "0"; });
+            const activeCont = document.getElementById(id);
+            activeCont.classList.add('active');
+            setTimeout(() => activeCont.style.opacity = "1", 10);
+            document.querySelectorAll('.main-nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + id).classList.add('active');
+            document.getElementById('controls-wrapper').style.display = id === 'menu' ? 'block' : 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function validarFormulario() {
+            const n = document.getElementById('nombre-cliente').value.trim();
+            const p = document.getElementById('cant-personas').value;
+            const h = document.getElementById('horario-pedido').value;
+            document.getElementById('btn-whatsapp-container').style.display = (n && p > 0 && h && cart.length > 0) ? 'block' : 'none';
+        }
+
+        function sendOrder() {
+            const n = document.getElementById('nombre-cliente').value;
+            const p = document.getElementById('cant-personas').value;
+            const h = document.getElementById('horario-pedido').value;
+            const obs = document.getElementById('notas-pedido').value;
+            let total = cart.reduce((a, b) => a + b.precio, 0);
+            let m = `*🏮 NUEVO PEDIDO - TAESCRIP 🏮*\n👤 *Cliente:* ${n}\n👥 *Personas:* ${p}\n⏰ *Hora:* ${h}hs\n`;
+            if(obs) m += `📝 *Notas:* ${obs}\n`;
+            m += `━━━━━━━━━━━━━━\n`;
+            cart.forEach(i => m += `• ${i.nombre} ($${i.precio})\n`);
+            m += `\n💰 *TOTAL:* $${total}`;
+            window.open(`https://wa.me/5491138223341?text=${encodeURIComponent(m)}`, '_blank');
+        }
+
+        updateTheme();
+        renderMenu();
+    </script>
+</body>
+</html>
